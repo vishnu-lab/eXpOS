@@ -14,6 +14,11 @@ loadi(3, 16);
 loadi(63,13);
 loadi(64,14);
 
+//loading timer interrupt
+loadi(4, 17);
+loadi(5, 18);
+
+
 //creating page table entries for init program
  PTBR = PAGE_TABLE_BASE;
  PTLR = 10;
