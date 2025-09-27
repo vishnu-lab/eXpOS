@@ -1,0 +1,31 @@
+//loading init program
+loadi(65,7);
+loadi(66,8);
+
+//loading int 10 module
+loadi(22,35);
+loadi(23,36);
+
+//loading exception handler
+loadi(2, 15);
+loadi(3, 16);
+
+//creating page table entries for init program
+ PTBR = PAGE_TABLE_BASE;
+ PTLR = 3;
+
+//setting up the values of page table
+[PTBR + 0] = 65;
+[PTBR + 1] = "0100";
+[PTBR + 2] = 66;
+[PTBR + 3] = "0100";
+[PTBR + 4] =  76;
+[PTBR + 5] = "0110";
+
+// adding -1 because we will increment SP and push the values every time we invoke "PUSH"
+SP = 76*512 -1;
+R0 = 0;
+multipush (R0);
+SP = 2*512;
+ireturn;
+
