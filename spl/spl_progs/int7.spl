@@ -1,0 +1,35 @@
+//setting the mode flag to sys call number
+[PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16 ) + 9] = 5;
+
+//storing the user stack value in process table of that process
+[PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16 ) + 13] = SP;
+
+alias userSP R0;
+userSP = SP;
+
+//setting up the stack to kernel stack 
+SP = [PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16 ) + 11] * 512 - 1;
+
+//fetching the first argument of the system call
+alias fileDescriptorAddr R1;
+fileDescriptorAddr = ([PTBR + 2 * ((userSP - 4) / 512)] * 512) + ((userSP - 4) % 512);
+alias fileDescriptor R2;
+fileDescriptor = [fileDescriptorAddr];
+
+alias returnValueAddr R3;
+returnValueAddr = ([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512);
+
+if ( fileDescriptor != -2 ) 
+then
+  [returnValueAddr] = -1;
+else
+  alias valueToBePrintedAddr R4;
+  valueToBePrintedAddr = ([PTBR + 2 * ((userSP - 3) / 512)] * 512) + ((userSP - 3) % 512);
+  R5 = [valueToBePrintedAddr];
+  print R5;
+  [returnValueAddr] = 0;
+endif;
+
+SP = userSP;
+[PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16 ) + 9] = 0;
+ireturn; 

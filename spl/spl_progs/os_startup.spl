@@ -18,6 +18,10 @@ loadi(64,14);
 loadi(4, 17);
 loadi(5, 18);
 
+//loading int 7 module
+loadi(16,29);
+loadi(17,30);
+
 //setting up the process table for init process
 [PROCESS_TABLE + 1] = 0;
 
