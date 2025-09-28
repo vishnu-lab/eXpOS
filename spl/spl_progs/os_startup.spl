@@ -18,6 +18,15 @@ loadi(64,14);
 loadi(4, 17);
 loadi(5, 18);
 
+//setting up the process table for init process
+[PROCESS_TABLE + 1] = 0;
+
+//allocate the kernel stack to init program
+[PROCESS_TABLE + 11] = 80;
+
+//initialize system status table entry for current running PID of user process
+[SYSTEM_STATUS_TABLE + 1] = 0;
+
 
 //creating page table entries for init program
  PTBR = PAGE_TABLE_BASE;
