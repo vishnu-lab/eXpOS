@@ -1,0 +1,41 @@
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1]*16) + 13] = SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1]*16) + 11]*512 - 1;
+backup;
+
+
+alias currentPID R0;
+alias nextPID R1;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 12] = SP % 512;
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 4] = READY;
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 14] = PTBR;
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 15] = PTLR;
+currentPID = [SYSTEM_STATUS_TABLE + 1];
+
+if(currentPID == 0) then
+nextPID = 1;
+else
+nextPID = 0;
+endif;
+
+
+alias new_process_table R2;
+new_process_table  = PROCESS_TABLE + (nextPID * 16);
+
+SP =  [new_process_table + 11] * 512 + [new_process_table + 12] ;
+PTBR = [new_process_table + 14];
+PTLR = [new_process_table + 15];
+
+[SYSTEM_STATUS_TABLE + 1] = nextPID;
+
+if([new_process_table + 4] == CREATED) then
+	[new_process_table + 4] = RUNNING;
+	SP = [new_process_table + 13];
+	ireturn;
+endif;
+
+
+[new_process_table + 4] = RUNNING;
+restore;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16  + 13];
+ireturn;
