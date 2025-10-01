@@ -53,16 +53,16 @@ loadi(70,12);
 PTBR=PAGE_TABLE_BASE;  //as PID of idle process is 0
 
 //Library
-[PTBR+0] = -1;
-[PTBR+1] = "0000";
-[PTBR+2] = -1;
-[PTBR+3] = "0000";
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
 
 //Heap
-[PTBR+4] = -1;
-[PTBR+5] = "0000";
-[PTBR+6] = -1;
-[PTBR+7] = "0000";
+[PTBR+4] = 83;
+[PTBR+5] = "0110";
+[PTBR+6] = 84;
+[PTBR+7] = "0110";
 
 //Code
 [PTBR+8] = 69;
@@ -77,8 +77,8 @@ PTBR=PAGE_TABLE_BASE;  //as PID of idle process is 0
 //Stack
 [PTBR+16] = 81;
 [PTBR+17] = "0110";
-[PTBR+18] = -1;
-[PTBR+19] = "0000";
+[PTBR+18] = 85;
+[PTBR+19] = "0110";
 
 //setting up user stack of idle process
 SP = 81*512 - 1;
