@@ -1,0 +1,72 @@
+//loading boot module
+loadi(54,67);
+loadi(55,68);
+
+//loading idle process
+loadi(69,11);
+loadi(70,12);
+
+//using idle process user area page
+SP = 82*512 -1;
+
+call BOOT_MODULE;
+
+//setting up page table entries for idle process
+PTBR = PAGE_TABLE_BASE;
+PTLR = 10;
+
+//Library
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
+
+//Heap
+[PTBR+4] = 83;
+[PTBR+5] = "0110";
+[PTBR+6] = 84;
+[PTBR+7] = "0110";
+
+//Code
+[PTBR+8] = 69;
+[PTBR+9] = "0100";
+[PTBR+10] = 70;
+[PTBR+11] = "0100";
+[PTBR+12] = -1;
+[PTBR+13] = "0000";
+[PTBR+14] = -1;
+[PTBR+15] = "0000";
+
+//Stack
+[PTBR+16] = 81;
+[PTBR+17] = "0110";
+[PTBR+18] = 85;
+[PTBR+19] = "0110";
+
+alias process_id R1;
+process_id = 0;
+
+//PID
+[PROCESS_TABLE + process_id*16 + 1] = 0;
+//state 
+[PROCESS_TABLE + process_id*16 + 4] = RUNNING;
+//user area page num
+[PROCESS_TABLE + process_id*16 + 11] = 82;
+//KTPR
+[PROCESS_TABLE + process_id*16 + 12] = 0;
+//UTPR
+[PROCESS_TABLE + process_id*16 + 13] = 8*512;
+//PTBR
+[PROCESS_TABLE + process_id*16 + 14] = PAGE_TABLE_BASE;
+//PTLR
+[PROCESS_TABLE + process_id*16 + 15] = 10;
+
+
+//setting up the current running process in system status table
+[SYSTEM_STATUS_TABLE + 1] = 0;
+
+SP = 81*512-1;
+R0 = [69*512+1];
+multipush(R0);
+SP = 8*512;
+ireturn;
