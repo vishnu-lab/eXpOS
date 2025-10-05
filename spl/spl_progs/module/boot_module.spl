@@ -29,6 +29,9 @@ loadi(51,64);
 //loading odd numbers program 
 loadi(86,69); // uploaded the file using xfs-interface and got the disk block used by dumping the inodeuser table
 
+//loading even numbers program
+loadi(92,70);
+
 //set the state of all process table entries to TERMINATED
 alias process_id R1;
 process_id = 0;
@@ -146,6 +149,53 @@ SP = 89*512-1;
 R0 = [86*512+1];
 multipush(R0);
 
+
+
+//setting up page table for odd numbers program
+PTBR = PAGE_TABLE_BASE + 60;
+
+[PTBR + 0] = 63;
+[PTBR + 1] = "0100";
+[PTBR + 2] = 64;
+[PTBR + 3] = "0100";
+[PTBR + 4] = 93;
+[PTBR + 5] = "0110";
+[PTBR + 6] = 94;
+[PTBR + 7] = "0110";
+[PTBR + 8] = 92;
+[PTBR + 9] = "0100";
+[PTBR + 10] = -1;
+[PTBR + 11] = "0000";
+[PTBR + 12] = -1;
+[PTBR + 13] = "0000";
+[PTBR + 14] = -1;
+[PTBR + 15] = "0000";
+[PTBR + 16] = 95;
+[PTBR + 17] = "0110";
+[PTBR + 18] = 96;
+[PTBR + 19] = "0110";
+
+//setting process table for odd numbers program
+process_id = 3;
+
+//PID
+[PROCESS_TABLE + process_id*16 + 1] = 2;
+//state 
+[PROCESS_TABLE + process_id*16 + 4] = CREATED;
+//user area page num
+[PROCESS_TABLE + process_id*16 + 11] = 97;
+//KTPR
+[PROCESS_TABLE + process_id*16 + 12] = 0;
+//UTPR
+[PROCESS_TABLE + process_id*16 + 13] = 8*512;
+//PTBR
+[PROCESS_TABLE + process_id*16 + 14] = PAGE_TABLE_BASE+60;
+//PTLR
+[PROCESS_TABLE + process_id*16 + 15] = 10;
+
+SP = 95*512-1;
+R0 = [92*512+1];
+multipush(R0);
 
 //moving back to original stack (kernel stack of idle process)
 SP = R2;
