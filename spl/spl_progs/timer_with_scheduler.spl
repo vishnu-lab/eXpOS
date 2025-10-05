@@ -15,10 +15,15 @@ currentPID = [SYSTEM_STATUS_TABLE + 1];
 
 if(currentPID == 0) then
 nextPID = 1;
-else
-nextPID = 0;
 endif;
 
+if(currentPID == 1) then
+nextPID = 2;
+endif;
+
+if(currentPID == 2) then
+nextPID = 0;
+endif;
 
 alias new_process_table R2;
 new_process_table  = PROCESS_TABLE + (nextPID * 16);

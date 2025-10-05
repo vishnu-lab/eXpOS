@@ -22,6 +22,9 @@ loadi(5, 18);
 loadi(16,29);
 loadi(17,30);
 
+//loading odd numbers program 
+loadi(86,69); // uploaded the file using xfs-interface and got the disk block used by dumping the inodeuser table
+
  //creating page table entries for init program
  PTBR = PAGE_TABLE_BASE + 20;
  PTLR = 10;
@@ -78,9 +81,56 @@ process_id = 1;
 //PTLR
 [PROCESS_TABLE + process_id*16 + 15] = 10;
 
-R1 = SP;
+R2 = SP;
 SP = 76*512-1;
 R0 = [65*512 +1];
 multipush(R0);
-SP = R1;
+
+//setting up page table for odd numbers program
+PTBR = PAGE_TABLE_BASE + 40;
+
+[PTBR + 0] = 63;
+[PTBR + 1] = "0100";
+[PTBR + 2] = 64;
+[PTBR + 3] = "0100";
+[PTBR + 4] = 87;
+[PTBR + 5] = "0110";
+[PTBR + 6] = 88;
+[PTBR + 7] = "0110";
+[PTBR + 8] = 86;
+[PTBR + 9] = "0100";
+[PTBR + 10] = -1;
+[PTBR + 11] = "0000";
+[PTBR + 12] = -1;
+[PTBR + 13] = "0000";
+[PTBR + 14] = -1;
+[PTBR + 15] = "0000";
+[PTBR + 16] = 89;
+[PTBR + 17] = "0110";
+[PTBR + 18] = 90;
+[PTBR + 19] = "0110";
+
+//setting process table for odd numbers program
+process_id = 2;
+
+//PID
+[PROCESS_TABLE + process_id*16 + 1] = 2;
+//state 
+[PROCESS_TABLE + process_id*16 + 4] = CREATED;
+//user area page num
+[PROCESS_TABLE + process_id*16 + 11] = 91;
+//KTPR
+[PROCESS_TABLE + process_id*16 + 12] = 0;
+//UTPR
+[PROCESS_TABLE + process_id*16 + 13] = 8*512;
+//PTBR
+[PROCESS_TABLE + process_id*16 + 14] = PAGE_TABLE_BASE+40;
+//PTLR
+[PROCESS_TABLE + process_id*16 + 15] = 10;
+
+SP = 89*512-1;
+R0 = [86*512+1];
+multipush(R0);
+
+SP = R2;
 return;
