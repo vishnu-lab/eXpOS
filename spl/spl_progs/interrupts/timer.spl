@@ -1,0 +1,22 @@
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1]*16) + 13] = SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 11]*512 -1;
+backup;
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 4] = READY;
+
+alias pid R1;
+pid = 0;
+
+while (pid<MAX_PROC_NUM) do
+
+  if ([PROCESS_TABLE + pid*16 + 4] != TERMINATED) then
+    [PROCESS_TABLE + pid*16] = [PROCESS_TABLE + pid*16] + 1;
+  endif;
+  pid = pid + 1;
+endwhile;
+
+call SCHEDULER;
+restore;
+SP=[PROCESS_TABLE+([SYSTEM_STATUS_TABLE+1]*16)+13];
+[PROCESS_TABLE+([SYSTEM_STATUS_TABLE+1]*16)+9]=0;
+breakpoint;
+ireturn;

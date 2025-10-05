@@ -22,8 +22,23 @@ loadi(5, 18);
 loadi(16,29);
 loadi(17,30);
 
+//loading scheduler module
+loadi(50,63);
+loadi(51,64);
+
 //loading odd numbers program 
 loadi(86,69); // uploaded the file using xfs-interface and got the disk block used by dumping the inodeuser table
+
+//set the state of all process table entries to TERMINATED
+alias process_id R1;
+process_id = 0;
+
+while( process_id < MAX_PROC_NUM ) do
+[PROCESS_TABLE + process_id*16 + 4] = TERMINATED;
+process_id = process_id + 1;
+endwhile;
+
+
 
  //creating page table entries for init program
  PTBR = PAGE_TABLE_BASE + 20;
@@ -63,7 +78,6 @@ loadi(86,69); // uploaded the file using xfs-interface and got the disk block us
 
 
 //setting up process table entries for init process
-alias process_id R1;
 process_id = 1;
 
 //PID
@@ -132,5 +146,7 @@ SP = 89*512-1;
 R0 = [86*512+1];
 multipush(R0);
 
+
+//moving back to original stack (kernel stack of idle process)
 SP = R2;
 return;

@@ -1,0 +1,50 @@
+alias currentPID R1;
+currentPID = [SYSTEM_STATUS_TABLE + 1];
+multipush(BP);
+R2 = SP % 512;
+[PROCESS_TABLE + currentPID*16 + 12] = R2;
+[PROCESS_TABLE + currentPID*16 + 14] = PTBR;
+[PROCESS_TABLE + currentPID*16 + 15] = PTLR;
+
+alias nextPID R2;
+
+nextPID = currentPID + 1;
+
+if(nextPID == MAX_PROC_NUM) then
+   nextPID = 0;
+endif;
+
+while(1 == 1) do 
+  if(([PROCESS_TABLE + nextPID*16 + 4] == READY || [PROCESS_TABLE + nextPID*16 + 4] == CREATED) && nextPID != 0) then
+    break;
+  endif;
+
+  nextPID = nextPID + 1;
+
+  if(nextPID == MAX_PROC_NUM) then
+    nextPID = 0;
+  endif;
+
+  if(nextPID == currentPID + 1) then
+    nextPID = 0;
+    break;
+  endif;
+
+endwhile;
+
+SP = [PROCESS_TABLE + nextPID*16 + 11]* 512 + [PROCESS_TABLE + nextPID*16 + 12];
+PTBR = [PROCESS_TABLE + nextPID*16 + 14];
+PTLR = [PROCESS_TABLE + nextPID* 16 + 15];
+
+[SYSTEM_STATUS_TABLE + 1] = nextPID;
+
+if( [PROCESS_TABLE + nextPID*16 + 4] == CREATED ) then
+  SP  = [PROCESS_TABLE + nextPID*16 + 13];
+  [PROCESS_TABLE + nextPID*16 + 4] = RUNNING;
+  [PROCESS_TABLE + nextPID*16 + 9] = 0;
+  ireturn;
+endif;
+
+[PROCESS_TABLE + nextPID*16 + 4] = RUNNING;
+multipop(BP);
+return;
