@@ -1,17 +1,36 @@
 alias functionNum R1;
 alias currentPID R2;
 
-if (functionNum == 3) then
+if (functionNum == TERMINAL_WRITE) then
   multipush(R1,R2,R3);
-  functionNum = 8;
+  functionNum = ACQUIRE_TERMINAL;
   call RESOURCE_MANAGER;
   multipop(R1,R2,R3);
   print R3;
 
   multipush(R1,R2,R3);
-  functionNum = 9;
+  functionNum = RELEASE_TERMINAL;
   call RESOURCE_MANAGER;
   multipop(R1,R2,R3);
   return;
 endif;
+
+if (functionNum == TERMINAL_READ) then
+  multipush(R1,R2,R3);
+  functionNum = ACQUIRE_TERMINAL;
+  call RESOURCE_MANAGER;
+  multipop(R1,R2,R3);
+  
+  read;
+  [PROCESS_TABLE + currentPID*16 + 4] = WAIT_TERMINAL;
+  multipush(R1,R2,R3);
+  call SCHEDULER;
+  multipop(R1,R2,R3);
+  
+  alias physicalAddress R4;
+  physicalAddress = ([PTBR + 2*(R3/512)]*512) + (R3 % 512);
+  [physicalAddress] = [PROCESS_TABLE + currentPID*16 + 8];
+  return;
+endif;
+
 return;
