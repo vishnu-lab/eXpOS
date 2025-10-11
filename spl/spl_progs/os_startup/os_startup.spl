@@ -22,10 +22,10 @@ PTLR = 10;
 [PTBR+3] = "0100";
 
 //Heap
-[PTBR+4] = 83;
-[PTBR+5] = "0110";
-[PTBR+6] = 84;
-[PTBR+7] = "0110";
+[PTBR+4] = 0;
+[PTBR+5] = "0000";
+[PTBR+6] = 0;
+[PTBR+7] = "0000";
 
 //Code
 [PTBR+8] = 69;
@@ -40,8 +40,8 @@ PTLR = 10;
 //Stack
 [PTBR+16] = 81;
 [PTBR+17] = "0110";
-[PTBR+18] = 85;
-[PTBR+19] = "0110";
+[PTBR+18] = 0;
+[PTBR+19] = "0000";
 
 alias process_id R1;
 process_id = 0;

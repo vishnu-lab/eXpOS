@@ -1,0 +1,143 @@
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 9;
+alias userSP R0;
+userSP = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 -1;
+
+alias fileName R1;
+fileName = [PTBR + 2*((userSP-4)/512)]*512 + ((userSP-4)%512);
+alias inodeIndex R2;
+inodeIndex = 0;
+while (inodeIndex < MAX_FILE_NUM) do 
+  if ([INODE_TABLE + inodeIndex*16 + 1] == fileName && [INODE_TABLE + inodeIndex*16] == EXEC) then
+    break;
+  endif;
+  inodeIndex = inodeIndex + 1;
+endwhile;
+
+if (inodeIndex == MAX_FILE_NUM) then
+  [[PTBR + 2*((userSP-1)/512)]*512 + ((userSP-1)%512)] = -1;
+  SP = userSP;
+  ireturn;
+endif;
+
+multipush(R0,R1,R2);
+R1 = EXIT_PROCESS;
+R2 = [SYSTEM_STATUS_TABLE + 1];
+call PROCESS_MANAGER;
+multipop(R0,R1,R2);
+
+alias userArea R3;
+R3 = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
+[MEMORY_FREE_LIST + userArea] = 1;
+[SYSTEM_STATUS_TABLE + 2]  = [SYSTEM_STATUS_TABLE + 2] - 1;
+SP = userArea*512 -1;
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = RUNNING;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 7] = inodeIndex;
+
+alias pagetable R4;
+pagetable  = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 14];
+
+//library linkage
+[pagetable] = 63;
+[pagetable + 1] = "0100";
+[pagetable + 2] = 64;
+[pagetable + 3] = "0100";
+
+//allocating heap page 1
+multipush(R0,R1,R2,R3,R4);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R5 = R0;
+multipop(R0,R1,R2,R3,R4);
+[pagetable + 4] = R5;
+[pagetable + 5] = "0110";
+
+
+//allocating heap page 2
+multipush(R0,R1,R2,R3,R4);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R5 = R0;
+multipop(R0,R1,R2,R3,R4);
+[pagetable + 6] = R5;
+[pagetable + 7] = "0110";
+
+
+//allocating stack page 1
+multipush(R0,R1,R2,R3,R4);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R5 = R0;
+multipop(R0,R1,R2,R3,R4);
+[pagetable + 16] = R5;
+[pagetable + 17] = "0110";
+
+
+//allocating stack page 2
+multipush(R0,R1,R2,R3,R4);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R5 = R0;
+multipop(R0,R1,R2,R3,R4);
+[pagetable + 18] = R5;
+[pagetable + 19] = "0110";
+
+if ([INODE_TABLE + inodeIndex*16 + 8] != -1) then
+  multipush(R0,R1,R2,R3,R4);
+  R1 = GET_FREE_PAGE;
+  call MEMORY_MANAGER;
+  R5 = R0;
+  multipop(R0,R1,R2,R3,R4);
+
+  loadi(R5,[INODE_TABLE + inodeIndex*16 + 8]);
+  [pagetable + 8] = R5;
+  [pagetable + 9] = "0100";
+endif;
+
+if ([INODE_TABLE + inodeIndex*16 + 9] != -1) then
+  multipush(R0,R1,R2,R3,R4);
+  R1 = GET_FREE_PAGE;
+  call MEMORY_MANAGER;
+  R5 = R0;
+  multipop(R0,R1,R2,R3,R4);
+
+  loadi(R5,[INODE_TABLE + inodeIndex*16 + 9]);
+  [pagetable + 10] = R5;
+  [pagetable + 11] = "0100";
+endif;
+
+if ([INODE_TABLE + inodeIndex*16 + 10] != -1) then
+  multipush(R0,R1,R2,R3,R4);
+  R1 = GET_FREE_PAGE;
+  call MEMORY_MANAGER;
+  R5 = R0;
+  multipop(R0,R1,R2,R3,R4);
+
+  loadi(R5,[INODE_TABLE + inodeIndex*16 + 10]);
+  [pagetable + 12] = R5;
+  [pagetable + 13] = "0100";
+endif;
+
+if ([INODE_TABLE + inodeIndex*16 + 11] != -1) then
+  multipush(R0,R1,R2,R3,R4);
+  R1 = GET_FREE_PAGE;
+  call MEMORY_MANAGER;
+  R5 = R0;
+  multipop(R0,R1,R2,R3,R4);
+
+  loadi(R5,[INODE_TABLE + inodeIndex*16 + 11]);
+  [pagetable + 14] = R5;
+  [pagetable + 15] = "0100";
+endif;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 15] = 10;
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+PTBR = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 14];
+PTLR = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 15];
+SP = [pagetable +16]*512 - 1;
+R5 = [[pagetable + 8]*512 + 1];
+multipush(R5);
+SP = 8*512;
+ireturn;
