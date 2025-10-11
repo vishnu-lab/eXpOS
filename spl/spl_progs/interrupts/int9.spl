@@ -5,7 +5,7 @@ userSP = SP;
 SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 -1;
 
 alias fileName R1;
-fileName = [PTBR + 2*((userSP-4)/512)]*512 + ((userSP-4)%512);
+fileName = [[PTBR + 2*((userSP-4)/512)]*512 + ((userSP-4)%512)];
 alias inodeIndex R2;
 inodeIndex = 0;
 while (inodeIndex < MAX_FILE_NUM) do 

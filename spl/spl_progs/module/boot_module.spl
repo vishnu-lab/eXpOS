@@ -51,6 +51,10 @@ loadi(3, 16);
 loadi(63,13);
 loadi(64,14);
 
+//loading inodetable
+loadi(59,3);
+loadi(60,4);
+
 //loading init program
 loadi(65,7);
 loadi(66,8);

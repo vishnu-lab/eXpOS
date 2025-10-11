@@ -15,5 +15,4 @@ if(isTerminated == 1) then
   halt;
 endif;
 
-breakpoint;
 call SCHEDULER;
