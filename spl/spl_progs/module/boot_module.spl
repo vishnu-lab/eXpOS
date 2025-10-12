@@ -23,6 +23,10 @@ loadi(5, 18);
 loadi(8, 21);
 loadi(9, 22);
 
+//loading disk interrupt
+loadi(6, 19);
+loadi(7, 20);
+
 //load resource manager module
 loadi(40,53);
 loadi(41,54);
@@ -58,6 +62,9 @@ loadi(60,4);
 //loading init program
 loadi(65,7);
 loadi(66,8);
+
+//initializing disk status table
+[DISK_STATUS_TABLE] = 0;
 
 //set the state of all process table entries to TERMINATED
 alias process_id R1;
@@ -125,13 +132,21 @@ process_id = 1;
 //PTLR
 [PROCESS_TABLE + process_id*16 + 15] = 10;
 
+//initializing the pre-resource table of init process
+alias i R3;
+i = 495;
+
+while (i<512) do 
+  [[PROCESS_TABLE + process_id*16 + 11]*512 + i] = -1;
+  i = i + 1;
+endwhile;
+
 R2 = SP;
 SP = 76*512-1;
 R0 = [65*512 +1];
 multipush(R0);
 
 //initilaizing the mem free list
-alias i R3;
 i = 0;
 while (i <= 82) do
   [MEMORY_FREE_LIST + i] = 1;
