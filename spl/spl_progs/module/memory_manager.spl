@@ -42,4 +42,51 @@ if (functionNum == RELEASE_PAGE) then
   endif;
   return;
 endif;
+
+if (functionNum == GET_CODE_PAGE) then
+  alias blockNum R2;
+  alias i R3;
+  alias j R4;
+  i = 0;
+  while (i < MAX_PROC_NUM) do
+    j = 4;
+    while (j < 8) do
+      if ([DISK_MAP_TABLE + i*10 + j] == blockNum) then
+        
+        alias pagetable R5;
+        alias pageValidity R6;
+        
+        pagetable = [PROCESS_TABLE + i*16 + 14];
+        pageValidity = [pagetable + 2*j + 1];
+
+        if (([PROCESS_TABLE + i*16 + 15] > j) && (pageValidity == "0100" || pageValidity == "0101" || pageValidity == "0110" || pageValidity == "0111" || pageValidity == "1100" || pageValidity == "1101" || pageValidity == "1110" || pageValidity == "1111")) then
+          R0 = [pagetable + 2*j];
+          [MEMORY_FREE_LIST + R0] = [MEMORY_FREE_LIST + R0] + 1;
+          return;
+        endif;
+      endif;
+      j = j + 1;
+    endwhile;
+    i = i + 1;
+  endwhile;
+
+  multipush(R1,R2);
+  alias pageNum R3;
+  R1 = GET_FREE_PAGE;
+  call MEMORY_MANAGER;
+  multipop(R1,R2);
   
+  multipush(R0,R1,R2,R3,R4);
+  pageNum = R0;
+  R4 = blockNum;
+  R2 = [SYSTEM_STATUS_TABLE + 1];
+  R1 = DISK_LOAD;
+  call DEVICE_MANAGER;
+  multipop(R0,R1,R2,R3,R4);
+  return;
+endif; 
+
+if (functionNum == RELEASE_BLOCK) then
+  [DISK_FREE_LIST + R2] = [DISK_FREE_LIST + R2] - 1;
+  return;
+endif;

@@ -52,6 +52,36 @@ if (functionNum == FREE_PAGE_TABLE) then
    endif;
    i = i+1;
   endwhile;
-  return;
-endif;
   
+  //releasing disk pages of heap
+  i = 2;
+  while (i<=3) do
+    if ([DISK_MAP_TABLE + Pid*10 + i] != -1) then
+      multipush(R1,R2,R3,R4,R5,R6);
+      R1 = RELEASE_BLOCK;
+      R3 = Pid;
+      R2 = [DISK_MAP_TABLE + Pid*10 + i];
+      call MEMORY_MANAGER;
+      multipop(R1,R2,R3,R4,R5,R6);
+      [DISK_MAP_TABLE + Pid*10 + i] = -1;
+    endif;
+    i = i + 1;
+  endwhile;  
+
+  //releasing disk pages of stack
+  i = 8;
+  while (i<=9) do
+    if ([DISK_MAP_TABLE + Pid*10 + i] != -1) then
+      multipush(R1,R2,R3,R4,R5,R6);
+      R1 = RELEASE_BLOCK;
+      R3 = Pid;
+      R2 = [DISK_MAP_TABLE + Pid*10 + i];
+      call MEMORY_MANAGER;
+      multipop(R1,R2,R3,R4,R5,R6);
+      [DISK_MAP_TABLE + Pid*10 + i] = -1;
+    endif;
+    i = i + 1;
+  endwhile;  
+
+return;
+endif;

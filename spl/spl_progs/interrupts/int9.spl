@@ -46,23 +46,23 @@ pagetable  = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 14];
 [pagetable + 3] = "0100";
 
 //allocating heap page 1
-multipush(R0,R1,R2,R3,R4);
-R1 = GET_FREE_PAGE;
-call MEMORY_MANAGER;
-R5 = R0;
-multipop(R0,R1,R2,R3,R4);
-[pagetable + 4] = R5;
-[pagetable + 5] = "0110";
+//multipush(R0,R1,R2,R3,R4);
+//R1 = GET_FREE_PAGE;
+//call MEMORY_MANAGER;
+//R5 = R0;
+//multipop(R0,R1,R2,R3,R4);
+//[pagetable + 4] = R5;
+[pagetable + 5] = "0000";
 
 
 //allocating heap page 2
-multipush(R0,R1,R2,R3,R4);
-R1 = GET_FREE_PAGE;
-call MEMORY_MANAGER;
-R5 = R0;
-multipop(R0,R1,R2,R3,R4);
-[pagetable + 6] = R5;
-[pagetable + 7] = "0110";
+//multipush(R0,R1,R2,R3,R4);
+//R1 = GET_FREE_PAGE;
+//call MEMORY_MANAGER;
+//R5 = R0;
+//multipop(R0,R1,R2,R3,R4);
+//[pagetable + 6] = R5;
+[pagetable + 7] = "0000";
 
 
 //allocating stack page 1
@@ -85,31 +85,35 @@ multipop(R0,R1,R2,R3,R4);
 [pagetable + 19] = "0110";
 
 if ([INODE_TABLE + inodeIndex*16 + 8] != -1) then
-  R6 = 8;
-  call LOAD_PAGE_FUNC;
-  [pagetable + 8] = R7;
+  multipush(R0,R1,R2,R3,R4);
+  R1 = GET_CODE_PAGE;
+  R2 = [INODE_TABLE + inodeIndex*16 + 8];
+  call MEMORY_MANAGER;
+  R5 = R0;
+  multipop(R0,R1,R2,R3,R4);
+  [pagetable + 8] = R5;
   [pagetable + 9] = "0100";
 endif;
 
 if ([INODE_TABLE + inodeIndex*16 + 9] != -1) then
-  R6 = 9;
-  call LOAD_PAGE_FUNC; 
-  [pagetable + 10] = R7;
-  [pagetable + 11] = "0100";
+//  R6 = 9;
+//  call LOAD_PAGE_FUNC; 
+//  [pagetable + 10] = R7;
+  [pagetable + 11] = "0000";
 endif;
 
 if ([INODE_TABLE + inodeIndex*16 + 10] != -1) then
-  R6 = 10;
-  call LOAD_PAGE_FUNC; 
-  [pagetable + 12] = R7;
-  [pagetable + 13] = "0100";
+//  R6 = 10;
+//  call LOAD_PAGE_FUNC; 
+//  [pagetable + 12] = R7;
+  [pagetable + 13] = "0000";
 endif;
 
 if ([INODE_TABLE + inodeIndex*16 + 11] != -1) then
-  R6 = 11;
-  call LOAD_PAGE_FUNC;
-  [pagetable + 14] = R7;
-  [pagetable + 15] = "0100";
+//  R6 = 11;
+//  call LOAD_PAGE_FUNC;
+//  [pagetable + 14] = R7;
+  [pagetable + 15] = "0000";
 endif;
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 15] = 10;
 
@@ -121,6 +125,20 @@ while (i<512) do
   [userArea + i] = -1;
   i = i + 1;
 endwhile;
+
+//initialize disk map table
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 0] = -1;
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 1] = -1;
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 2] = -1;
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 3] = -1;
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 4] = [INODE_TABLE + inodeIndex*16 + 8];
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 5] = [INODE_TABLE + inodeIndex*16 + 9];
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 6] = [INODE_TABLE + inodeIndex*16 + 10];
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 7] = [INODE_TABLE + inodeIndex*16 + 11];
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 8] = -1;
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 9] = -1;
+
+
 
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
 PTBR = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 14];
