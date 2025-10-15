@@ -151,8 +151,8 @@ R0 = [65*512 +1];
 multipush(R0);
 
 //initializing disk map table for init process
-[DISK_MAP_TABLE + 10 + 4] = 65;
-[DISK_MAP_TABLE + 10 + 5] = 66;
+[DISK_MAP_TABLE + 10 + 4] = 7;
+[DISK_MAP_TABLE + 10 + 5] = 8;
 
 //initilaizing the mem free list
 i = 0;
