@@ -1,0 +1,137 @@
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 8;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 - 1;
+
+alias childPID R0;
+alias currentPID R1;
+currentPID = [SYSTEM_STATUS_TABLE + 1];
+multipush(R1);
+R1 = GET_PCB_ENTRY;
+call PROCESS_MANAGER;
+multipop(R1);
+
+if (childPID == -1) then
+  alias userSP R2;
+  userSP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+  [([PTBR + 2*((userSP-1)/512)]*512) + ((userSP-1)%512)] = -1;
+  [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0; 
+  SP = userSP;
+  ireturn;
+endif;
+
+alias heapValidity R2;
+heapValidity = [[PROCESS_TABLE + currentPID*16 + 14] + 5];
+if (heapValidity == "0000" || heapValidity == "0001" || heapValidity == "0010" || heapValidity == "0011" || heapValidity == "1000" || heapValidity == "1001" || heapValidity == "1010" || heapValidity == "1011") then
+  multipush(R0,R1);
+  R1 = GET_FREE_PAGE;
+  call MEMORY_MANAGER;
+  R2 = R0;
+  multipop(R0,R1);
+  [[PROCESS_TABLE + currentPID*16 + 14] + 4] = R2;
+  [[PROCESS_TABLE + currentPID*16 + 14] + 5] = "0110";
+
+  multipush(R0,R1);
+  R1 = GET_FREE_PAGE;
+  call MEMORY_MANAGER;
+  R2 = R0;
+  multipop(R0,R1);
+  [[PROCESS_TABLE + currentPID*16 + 14] + 6] = R2;
+  [[PROCESS_TABLE + currentPID*16 + 14] + 7] = "0110";
+endif;
+
+alias childPagetable R2;
+childPagetable = [PROCESS_TABLE + childPID*16 + 14];
+alias parentPagetable R3;
+parentPagetable = [PROCESS_TABLE + currentPID*16 + 14];
+
+alias i R4;
+i = 0;
+while (i<8) do
+  [childPagetable + 2*i] = [parentPagetable + 2*i];
+  [childPagetable + 2*i + 1] = [parentPagetable + 2*i + 1];
+  [MEMORY_FREE_LIST + [childPagetable + 2*i]] = [MEMORY_FREE_LIST + [childPagetable + 2*i]] + 1;
+  i = i + 1;
+endwhile;
+
+multipush(R0,R1,R2,R3);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R4 = R0;
+multipop(R0,R1,R2,R3);
+[childPagetable + 16] = R4;
+[childPagetable + 17] = "0110";
+
+multipush(R0,R1,R2,R3);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R4 = R0;
+multipop(R0,R1,R2,R3);
+[childPagetable + 18] = R4;
+[childPagetable + 19] = "0110";
+
+multipush(R0,R1,R2,R3);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R4 = R0;
+multipop(R0,R1,R2,R3);
+[PROCESS_TABLE + childPID*16 + 11] = R4;
+
+i = 0;
+while (i<10) do
+  [DISK_MAP_TABLE + childPID*10 + i] = [DISK_MAP_TABLE + currentPID*10 + i];
+  i = i + 1;
+endwhile;
+
+alias childUserarea R5;
+alias parentUserarea R6;
+
+childUserarea = [PROCESS_TABLE + childPID*16 + 11];
+parentUserarea = [PROCESS_TABLE + currentPID*16 + 11];
+
+i = 496;
+while (i<512) do
+  [childUserarea + i] = [parentUserarea + i];
+  i = i + 1;
+endwhile;
+
+alias childFirststk R5;
+alias parentFirststk R6;
+childFirststk = [childPagetable + 16];
+parentFirststk = [parentPagetable + 16];
+
+i = 0;
+while (i<512) do
+  [childFirststk*512 + i] = [parentFirststk*512 + i];
+  i = i + 1;
+endwhile;
+
+alias childSecondstk R5;
+alias parentSecondstk R6;
+childSecondstk = [childPagetable + 18];
+parentSecondstk = [parentPagetable + 18];
+
+i = 0;
+while (i<512) do
+  [childSecondstk*512 + i] = [parentSecondstk*512 + i];
+  i = i + 1;
+endwhile;
+[PROCESS_TABLE + childPID*16] = 0;
+[PROCESS_TABLE + childPID*16 + 2] = currentPID;
+[PROCESS_TABLE + childPID*16 + 3] = [PROCESS_TABLE + currentPID*16 + 3];
+[PROCESS_TABLE + childPID*16 + 4] = CREATED;
+[PROCESS_TABLE + childPID*16 + 6] = [PROCESS_TABLE + currentPID*16 + 6];
+[PROCESS_TABLE + childPID*16 + 7] = [PROCESS_TABLE + currentPID*16 + 7];
+[PROCESS_TABLE + childPID*16 + 9] = 0;
+[PROCESS_TABLE + childPID*16 + 10] = [PROCESS_TABLE + currentPID*16 + 10];
+[PROCESS_TABLE + childPID*16 + 12] = 0;
+[PROCESS_TABLE + childPID*16 + 13] = [PROCESS_TABLE + currentPID*16 + 13];
+[PROCESS_TABLE + childPID*16 + 9] = 0;
+[[PROCESS_TABLE+childPID*16+11]*512]=BP;
+
+alias childSP R7;
+childSP = [PROCESS_TABLE + childPID*16 + 13];
+[([[PROCESS_TABLE + childPID*16 + 14] + 2*((childSP-1)/512)]*512) + ((childSP-1)%512)] = 0;
+
+SP=[PROCESS_TABLE + currentPID*16 + 13];
+[([PTBR + 2*((SP-1)/512)]*512) + ((SP-1)%512)] = childPID;
+ireturn;

@@ -1,18 +1,9 @@
-[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = TERMINATED;
-alias i R1;
-i= 1;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 10;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 -1;
 
-alias isTerminated R2;
-isTerminated = 1;
-while(i<MAX_PROC_NUM) do
-  if([PROCESS_TABLE + i*16 + 4] != TERMINATED) then
-    isTerminated = 0;
-  endif;
-  i = i + 1;
-endwhile;
-
-if(isTerminated == 1) then
-  halt;
-endif;
+R1 = EXIT_PROCESS;
+R2 = [SYSTEM_STATUS_TABLE + 1];
+call PROCESS_MANAGER;
 
 call SCHEDULER;

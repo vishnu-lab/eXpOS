@@ -85,3 +85,23 @@ if (functionNum == FREE_PAGE_TABLE) then
 
 return;
 endif;
+
+if (functionNum == GET_PCB_ENTRY) then
+  alias i R0;
+  i = 0;
+  while (i<MAX_PROC_NUM) do
+    if ([PROCESS_TABLE + i*16 + 4] == TERMINATED) then
+      break;
+    endif;
+    i = i + 1;
+  endwhile;
+  if (i == MAX_PROC_NUM) then
+    i = -1;
+  else
+    [PROCESS_TABLE + i*16 + 1] = i;
+    [PROCESS_TABLE + i*16 + 4] = ALLOCATED;
+    [PROCESS_TABLE + i*16 + 14] = PAGE_TABLE_BASE + i*20;
+    [PROCESS_TABLE + i*16 + 15] = 10;
+  endif;
+  return;
+endif;

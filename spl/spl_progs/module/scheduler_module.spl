@@ -42,6 +42,7 @@ if( [PROCESS_TABLE + nextPID*16 + 4] == CREATED ) then
   SP  = [PROCESS_TABLE + nextPID*16 + 13];
   [PROCESS_TABLE + nextPID*16 + 4] = RUNNING;
   [PROCESS_TABLE + nextPID*16 + 9] = 0;
+  BP = [[PROCESS_TABLE + nextPID*16 + 11]*512];
   ireturn;
 endif;
 
