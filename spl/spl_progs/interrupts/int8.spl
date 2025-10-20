@@ -1,3 +1,4 @@
+ 
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 8;
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
 SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 - 1;
@@ -22,27 +23,19 @@ endif;
 alias heapValidity R2;
 heapValidity = [[PROCESS_TABLE + currentPID*16 + 14] + 5];
 if (heapValidity == "0000" || heapValidity == "0001" || heapValidity == "0010" || heapValidity == "0011" || heapValidity == "1000" || heapValidity == "1001" || heapValidity == "1010" || heapValidity == "1011") then
-  multipush(R0,R1);
-  R1 = GET_FREE_PAGE;
-  call MEMORY_MANAGER;
-  R2 = R0;
-  multipop(R0,R1);
-  [[PROCESS_TABLE + currentPID*16 + 14] + 4] = R2;
-  [[PROCESS_TABLE + currentPID*16 + 14] + 5] = "0110";
+  call FREE_PAGE;
+  [PTBR + 4] = R4;
+  [PTBR + 5] = "0110";
 
-  multipush(R0,R1);
-  R1 = GET_FREE_PAGE;
-  call MEMORY_MANAGER;
-  R2 = R0;
-  multipop(R0,R1);
-  [[PROCESS_TABLE + currentPID*16 + 14] + 6] = R2;
-  [[PROCESS_TABLE + currentPID*16 + 14] + 7] = "0110";
+  call FREE_PAGE;
+  [PTBR + 6] = R4;
+  [PTBR + 7] = "0110";
 endif;
 
 alias childPagetable R2;
 childPagetable = [PROCESS_TABLE + childPID*16 + 14];
 alias parentPagetable R3;
-parentPagetable = [PROCESS_TABLE + currentPID*16 + 14];
+parentPagetable = PTBR;
 
 alias i R4;
 i = 0;
@@ -53,27 +46,15 @@ while (i<8) do
   i = i + 1;
 endwhile;
 
-multipush(R0,R1,R2,R3);
-R1 = GET_FREE_PAGE;
-call MEMORY_MANAGER;
-R4 = R0;
-multipop(R0,R1,R2,R3);
+call FREE_PAGE;
 [childPagetable + 16] = R4;
 [childPagetable + 17] = "0110";
 
-multipush(R0,R1,R2,R3);
-R1 = GET_FREE_PAGE;
-call MEMORY_MANAGER;
-R4 = R0;
-multipop(R0,R1,R2,R3);
+call FREE_PAGE;
 [childPagetable + 18] = R4;
 [childPagetable + 19] = "0110";
 
-multipush(R0,R1,R2,R3);
-R1 = GET_FREE_PAGE;
-call MEMORY_MANAGER;
-R4 = R0;
-multipop(R0,R1,R2,R3);
+call FREE_PAGE;
 [PROCESS_TABLE + childPID*16 + 11] = R4;
 
 i = 0;
@@ -87,10 +68,18 @@ alias parentUserarea R6;
 
 childUserarea = [PROCESS_TABLE + childPID*16 + 11];
 parentUserarea = [PROCESS_TABLE + currentPID*16 + 11];
-
-i = 496;
-while (i<512) do
-  [childUserarea + i] = [parentUserarea + i];
+ 
+i = 0;
+alias childResource R8;
+alias parentResource R9;
+while (i<8) do
+  childResource = childUserarea*512 + RESOURCE_TABLE_OFFSET + 2*i;
+  parentResource = parentUserarea*512 + RESOURCE_TABLE_OFFSET + 2*i;
+  [childResource] = [parentResource];
+  [childResource + 1] = [parentResource + 1];
+  if ([childResource] == SEMAPHORE) then
+    [SEMAPHORE_TABLE + [childResource + 1]*4 + 1] = [SEMAPHORE_TABLE + [childResource + 1]*4 + 1] + 1;
+  endif;
   i = i + 1;
 endwhile;
 
@@ -134,4 +123,15 @@ childSP = [PROCESS_TABLE + childPID*16 + 13];
 
 SP=[PROCESS_TABLE + currentPID*16 + 13];
 [([PTBR + 2*((SP-1)/512)]*512) + ((SP-1)%512)] = childPID;
+ 
 ireturn;
+
+FREE_PAGE:
+ 
+multipush(R0,R1,R2,R3);
+R1 = GET_FREE_PAGE;
+call MEMORY_MANAGER;
+R4 = R0;
+multipop(R0,R1,R2,R3);
+ 
+return;

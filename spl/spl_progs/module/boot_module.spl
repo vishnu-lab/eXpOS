@@ -23,6 +23,14 @@ loadi(23,36);
 loadi(24,37);
 loadi(25,38);
 
+//loading int 13 module
+loadi(28,41);
+loadi(29,42);
+
+//loading int 14 module
+loadi(30,43);
+loadi(31,44);
+
 //loading int 15 module
 loadi(32,45);
 loadi(33,46);
@@ -74,6 +82,15 @@ loadi(60,4);
 //loading init program
 loadi(65,7);
 loadi(66,8);
+
+//initializing semaphore table
+alias j R0;
+j = 0;
+while (j<MAX_SEM_COUNT) do
+  [SEMAPHORE_TABLE + 4*j] = -1;
+  [SEMAPHORE_TABLE + 4*j + 1] = 0;
+  j = j + 1;
+endwhile;
 
 //initializing disk status table
 [DISK_STATUS_TABLE] = 0;
