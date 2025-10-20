@@ -1,0 +1,189 @@
+%-----------------------------------------------------------------------------------------------------------------------------------------------%
+%	The MIT License (MIT)
+%
+%	Copyright (c) 2021 Jitin Nair
+%
+%	Permission is hereby granted, free of charge, to any person obtaining a copy
+%	of this software and associated documentation files (the "Software"), to deal
+%	in the Software without restriction, including without limitation the rights
+%	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+%	copies of the Software, and to permit persons to whom the Software is
+%	furnished to do so, subject to the following conditions:
+%	
+%	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+%	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+%	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+%	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+%	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+%	THE SOFTWARE.
+%-----------------------------------------------------------------------------------------------------------------------------------------------%
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT DEFINITION
+%----------------------------------------------------------------------------------------
+\documentclass[a4paper,12pt]{article}
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES
+%----------------------------------------------------------------------------------------
+\usepackage{url}
+\usepackage{parskip} 	
+\RequirePackage{color}
+\RequirePackage{graphicx}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[scale=0.9]{geometry}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{supertabular}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage[style=authoryear,sorting=ynt, maxbibnames=2]{biblatex}
+\usepackage[unicode, draft=false]{hyperref}
+\usepackage{fontawesome5}
+
+%----------------------------------------------------------------------------------------
+%	LINK SETTINGS (black links)
+%----------------------------------------------------------------------------------------
+\definecolor{linkcolour}{rgb}{0,0,0}
+\hypersetup{
+  colorlinks=true,
+  breaklinks=true,
+  urlcolor=linkcolour,
+  linkcolor=linkcolour
+}
+
+%----------------------------------------------------------------------------------------
+%	SECTION FORMATTING
+%----------------------------------------------------------------------------------------
+\titleformat{\section}{\Large\scshape\raggedright}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{10pt}{10pt}
+\titleformat{\subsection}{\large\bfseries\raggedright}{}{0em}{}
+\titlespacing{\subsection}{0pt}{8pt}{5pt}
+
+%----------------------------------------------------------------------------------------
+%	JOB ENVIRONMENTS
+%----------------------------------------------------------------------------------------
+\newenvironment{jobshort}[2]
+    {
+    \begin{tabularx}{\linewidth}{@{}l X r@{}}
+    \textbf{#1} & \hfill &  #2 \\[3.75pt]
+    \end{tabularx}
+    }
+    {}
+
+\newenvironment{joblong}[2]
+    {
+    \begin{tabularx}{\linewidth}{@{}l X r@{}}
+    \textbf{#1} & \hfill &  #2 \\[3.75pt]
+    \end{tabularx}
+    \begin{minipage}[t]{\linewidth}
+    \begin{itemize}[nosep,after=\strut,leftmargin=1em,itemsep=3pt,label=$\bullet$]
+    }
+    {
+    \end{itemize}
+    \end{minipage}    
+    }
+
+%----------------------------------------------------------------------------------------
+%	BEGIN DOCUMENT
+%----------------------------------------------------------------------------------------
+\begin{document}
+\pagestyle{empty} 
+
+%----------------------------------------------------------------------------------------
+%	HEADER
+%----------------------------------------------------------------------------------------
+\begin{center}
+    {\Huge \textbf{Vishnu Karamsetty}} \\[5pt]
+    {\large Software Engineer} \\[7.5pt]
+    \href{https://linkedin.com/in/}{\raisebox{-0.05\height}\faLinkedin\ LinkedIn} \ $|$ \ 
+    \href{mailto:vishnukaramsetty2001@gmail.com}{\raisebox{-0.05\height}\faEnvelope\ vishnukaramsetty2001@gmail.com} \ $|$ \ 
+    \href{tel:+919515860804}{\raisebox{-0.05\height}\faMobile\ +91 95158 60804}
+\end{center}
+
+
+%----------------------------------------------------------------------------------------
+%	EDUCATION
+%----------------------------------------------------------------------------------------
+\section{Education}
+\begin{tabularx}{\linewidth}{@{}X r@{}}
+\textbf{National Institute of Technology, Calicut} & \textbf{Kozhikode, India} \\
+\textit{Bachelors of Technology in Computer Science, 8.65/10 CGPA} & \textit{Jul 2018 -- Apr 2022} \\
+\end{tabularx}
+
+
+
+%----------------------------------------------------------------------------------------
+%	EXPERIENCE
+%----------------------------------------------------------------------------------------
+\section{Experience}
+
+\begin{joblong}{Software Engineer, Visa}{06/2022 – Present}
+\end{joblong}
+
+\subsection*{Trino-Gateway Adoption \& Enhancement}
+Spearheaded the adoption of \textbf{Trino-Gateway} across Visa's data infrastructure, enhancing multi-tenant query routing based on \textbf{resource group statsistics} and \textbf{Active Directory groups}.
+\begin{itemize}[nosep, leftmargin=1.5em, label=$\bullet$]
+\item Integrated \textbf{LDAP} and \textbf{Vault} authentication, improving security and scalability for enterprise-grade use.
+\item Reduced \textbf{LDAP} load by implementing a \textbf{JWT-based caching layer}, significantly decreasing auth latency and infrastructure overhead. Contributed this feature to the Trino open-source community.
+\end{itemize}
+
+\subsection*{SQL Materialized View Generator}
+Developed a tool to auto generates materialized view definitions from query usage patterns, reducing manual effort in creating aggregate tables.
+\begin{itemize}[nosep, leftmargin=1.5em, label=$\bullet$]
+\item Enabled faster analytics by precomputing aggregates, improving query execution speed by up to 5x for critical workflows.
+\end{itemize}
+
+\subsection*{Query Performance Optimization}
+Diagnosed bottlenecks in long-running queries (3+ hours) and automated statistics collection, reducing execution time to under 10 minutes.
+\begin{itemize}[nosep, leftmargin=1.5em, label=$\bullet$]
+\item Improved query execution plans for critical workflows, significantly enhancing analyst productivity.
+\end{itemize}
+
+\subsection*{Trino Event Processor}
+Designed and built a module to capture query metadata and persist it to Apache Hive, enabling governance, monitoring, and downstream analytics.
+
+\subsection*{Alluxio Encryption with Vault Integration}
+Implemented secure key management with Vault integration for Alluxio caching, ensuring at-rest encryption and compliance with enterprise security standards.
+
+\subsection*{Resource-Group-Level Query Access Control}
+Implemented fine-grained authorization in Trino by adding query-resource-group–level access controls beyond the previous per-owner restriction.
+
+\begin{joblong}{Software Engineer - Intern, Siemens}{05/2021 – 07/2021}
+\item Collaborated in an Agile team to design and develop a full-stack web application for effort estimation using graph-based data modeling.
+\item Developed backend services using the ASP.NET Core framework, ensuring performance and scalability.
+\item Integrated Blazegraph as the graph database to efficiently model and query complex relationships between project components.
+\end{joblong}
+
+
+%----------------------------------------------------------------------------------------
+%	SKILLS
+%----------------------------------------------------------------------------------------
+\section{Skills}
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\textbf{Skill Set} & Java, SQL, Trino/Presto, Go Lang, DSA, DBMS, Distributed Systems \\
+\textbf{Tools \& Software} & Git, Jenkins, Docker, Grafana, Apache Hive, DB Visualizer, Tableau \\
+\end{tabularx}
+
+
+%----------------------------------------------------------------------------------------
+%	PERSONAL PROJECTS
+%----------------------------------------------------------------------------------------
+\section{Personal Projects}
+
+\begin{tabularx}{\linewidth}{ @{}l r@{} }
+\textbf{eXpOS – Experimental Operating System} & \hfill \href{https://github.com/vishnu-lab/eXpOS}{\textbf{Link}} \\[3.75pt]
+\multicolumn{2}{@{}X@{}}{
+\begin{minipage}[t]{\linewidth}
+\begin{itemize}[nosep, leftmargin=1em, label=$\bullet$]
+\item Developed an experimental operating system on XSM, a hardware-emulating virtual machine, with key implementations including \textbf{virtual memory management, interrupt handling, demand paging, exception handling, a scheduler, and various system calls}.
+\end{itemize}
+\end{minipage}
+}  \\
+\end{tabularx}
+
+\vfill
+
+\end{document}

@@ -1,0 +1,57 @@
+alias userSP R0;
+alias syscall R1;
+userSP = SP;
+syscall = [[PTBR + 2*((SP-5)/512)]*512 + ((SP-5)%512)]; 
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = syscall;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 - 1;
+
+if (syscall == INT_WAIT) then
+  alias pid R2;
+  pid = [[PTBR + 2*((userSP-4)/512)]*512 + ((userSP-4)%512)];
+  
+  if (pid == [SYSTEM_STATUS_TABLE + 1] || pid<0 || pid>MAX_PROC_NUM || [PROCESS_TABLE + pid*16 + 4] == TERMINATED) then
+    [[PTBR + 2*((userSP-1)/512)]*512 + ((userSP-1)%512)] = -1;
+    SP = userSP;
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+    ireturn;
+  endif;
+  
+  [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = WAIT_PROCESS;
+  [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 5] = pid;
+  multipush(R0,R1,R2);
+  call SCHEDULER;
+  multipop(R0,R1,R2);
+  [[PTBR + 2*((userSP-1)/512)]*512 + ((userSP-1)%512)] = 0;
+  [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+  SP = userSP;
+  ireturn;
+endif;
+
+if (syscall == INT_SIGNAL) then
+  alias i R2;
+  i = 0;
+  while (i<MAX_PROC_NUM) do
+    if ([PROCESS_TABLE + i*16 + 4] == WAIT_PROCESS && [PROCESS_TABLE + i*16 + 5] == [SYSTEM_STATUS_TABLE + 1]) then
+      [PROCESS_TABLE + i*16 + 4] = READY;
+    endif;
+    i = i + 1;
+  endwhile;
+  [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+  [[PTBR + 2*((userSP-1)/512)]*512 + ((userSP-1)%512)] = 0;
+  SP = userSP;
+  ireturn;
+endif;
+
+if (syscall == INT_GETPID) then
+  [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+  [[PTBR + 2*((userSP-1)/512)]*512 + ((userSP-1)%512)] = [SYSTEM_STATUS_TABLE + 1];
+  SP = userSP;
+  ireturn;
+endif;
+
+if (syscall == INT_GETPPID) then
+  [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+  [[PTBR + 2*((userSP-1)/512)]*512 + ((userSP-1)%512)] = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 2];
+  SP = userSP;
+  ireturn;
+endif;
